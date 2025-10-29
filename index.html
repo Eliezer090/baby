@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contagem Regressiva Baby</title>
+    <!-- Carregando o Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carregando a fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Aplicando a fonte Inter como padrão */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Um pequeno gradiente sutil no fundo */
+        body {
+            background-color: #fdf2f8; /* Fundo rosa bem claro */
+            background-image: linear-gradient(to bottom right, #fdf2f8, #f0f9ff); /* Gradiente de rosa para azul claro */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-2xl mx-auto p-6 md:p-12">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 md:p-12 text-center">
+            
+            <!-- Título Principal -->
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600 mb-8">
+                Contagem regressiva para o nosso baby
+            </h1>
+            
+            <!-- Contêiner da Contagem -->
+            <div id="countdown-container" class="flex justify-center gap-4 sm:gap-6 md:gap-8">
+                
+                <!-- Bloco Dias -->
+                <div class="bg-pink-100/60 rounded-xl p-4 sm:p-6 w-24 sm:w-32 shadow-inner">
+                    <span id="days" class="block text-4xl sm:text-6xl font-bold text-pink-800">00</span>
+                    <span class="block text-xs sm:text-sm text-pink-700 uppercase mt-2">Dias</span>
+                </div>
+                
+                <!-- Bloco Horas -->
+                <div class="bg-blue-100/60 rounded-xl p-4 sm:p-6 w-24 sm:w-32 shadow-inner">
+                    <span id="hours" class="block text-4xl sm:text-6xl font-bold text-blue-800">00</span>
+                    <span class="block text-xs sm:text-sm text-blue-700 uppercase mt-2">Horas</span>
+                </div>
+                
+                <!-- Bloco Minutos -->
+                <div class="bg-pink-100/60 rounded-xl p-4 sm:p-6 w-24 sm:w-32 shadow-inner">
+                    <span id="minutes" class="block text-4xl sm:text-6xl font-bold text-pink-800">00</span>
+                    <span class="block text-xs sm:text-sm text-pink-700 uppercase mt-2">Minutos</span>
+                </div>
+                
+                <!-- Bloco Segundos -->
+                <div class="bg-blue-100/60 rounded-xl p-4 sm:p-6 w-24 sm:w-32 shadow-inner">
+                    <span id="seconds" class="block text-4xl sm:text-6xl font-bold text-blue-800">00</span>
+                    <span class="block text-xs sm:text-sm text-blue-700 uppercase mt-2">Segundos</span>
+                </div>
+            </div>
+            
+            <!-- Mensagem Final (quando a contagem zerar) -->
+            <div id="final-message" class="hidden">
+                <h2 class="text-4xl sm:text-5xl font-bold text-pink-600 animate-pulse">
+                    Chegou o grande dia! ❤️
+                </h2>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA DA CONTAGEM REGRESSIVA ---
+
+        // Seleciona os elementos que vão exibir o tempo
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        
+        // Seleciona os contêineres
+        const countdownContainer = document.getElementById('countdown-container');
+        const finalMessage = document.getElementById('final-message');
+
+        // Define a data alvo
+        const targetDate = new Date();
+        const currentYear = targetDate.getFullYear();
+        
+        // Mês 11 é Dezembro (meses começam em 0)
+        let targetTimestamp = new Date(currentYear, 11, 17, 0, 0, 0).getTime();
+
+        // Se a data já passou este ano, define para o próximo ano
+        if (new Date().getTime() > targetTimestamp) {
+            targetTimestamp = new Date(currentYear + 1, 11, 17, 0, 0, 0).getTime();
+        }
+
+        /**
+         * Adiciona um zero à esquerda se o número for menor que 10.
+         * @param {number} num - O número a ser formatado.
+         * @returns {string} - O número formatado como string.
+         */
+        function formatTime(num) {
+            return String(num).padStart(2, '0');
+        }
+
+        /**
+         * Atualiza o relógio da contagem regressiva.
+         */
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetTimestamp - now;
+
+            // Se a contagem terminou
+            if (distance < 0) {
+                clearInterval(interval); // Para o relógio
+                countdownContainer.classList.add('hidden'); // Esconde a contagem
+                finalMessage.classList.remove('hidden'); // Mostra a mensagem final
+                return;
+            }
+
+            // Cálculos de tempo
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Atualiza o HTML com os valores formatados
+            daysEl.innerHTML = formatTime(days);
+            hoursEl.innerHTML = formatTime(hours);
+            minutesEl.innerHTML = formatTime(minutes);
+            secondsEl.innerHTML = formatTime(seconds);
+        }
+
+        // Inicia o intervalo para atualizar o relógio a cada segundo
+        const interval = setInterval(updateCountdown, 1000);
+
+        // Chama a função uma vez no início para exibir o valor imediatamente
+        updateCountdown();
+    </script>
+
+</body>
+</html>
